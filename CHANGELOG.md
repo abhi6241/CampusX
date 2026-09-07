@@ -159,4 +159,80 @@ campusx/
 
 ---
 
+### [0.4.0] - 2026-09-07
+
+#### 🔐 Authentication
+- Supabase Auth integration with email/password sign-in
+- Email domain validation restricted to `@vce.ac.in`
+- Regex: `/^1602-\d{2}-\d{3}-\d{3}@vce\.ac\.in$/i`
+- Auto-extraction of roll number, branch, and year from email
+- Authenticated user session management via AuthProvider
+
+#### 🗄️ Database Schema
+| Table | Description |
+|-------|-------------|
+| `profiles` | User profiles linked to `auth.users` |
+
+**profiles table columns:**
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | UUID | PK, references auth.users |
+| `first_name` | TEXT | Immutable |
+| `last_name` | TEXT | Immutable |
+| `roll_number` | TEXT | Auto-extracted from email |
+| `branch` | TEXT | Auto-extracted (CSE, ECE, IT, etc.) |
+| `year` | INTEGER | Auto-extracted from email |
+| `avatar_url` | TEXT | Nullable |
+| `bio` | TEXT | Nullable |
+| `created_at` | TIMESTAMPTZ | Default NOW() |
+
+**Indexes:**
+- `idx_profiles_name_unique` - Unique compound index on `LOWER(first_name), LOWER(last_name)`
+- `idx_profiles_roll_number` - Unique index on roll_number
+- `idx_profiles_branch` - Index on branch for filtering
+- `idx_profiles_year` - Index on year for filtering
+
+**Row Level Security:**
+- Users can read all profiles
+- Users can only update/insert/delete their own profile
+- Auto-create profile trigger on user signup
+
+#### 🧩 New Components
+| Component | Description |
+|-----------|-------------|
+| `LoginForm` | Email/password sign-in with validation |
+| `SignupForm` | Registration with first/last name fields |
+| `UnauthorizedScreen` | Error screen for non-VCE emails |
+| `AuthProvider` | Supabase auth context provider |
+
+#### 📁 Files Created
+| File | Description |
+|------|-------------|
+| `src/lib/supabase.ts` | Supabase client + Database types |
+| `src/lib/auth.tsx` | AuthProvider + useAuth hook |
+| `src/lib/email-validation.ts` | VCE email regex + parsing |
+| `src/components/auth/login-form.tsx` | Login form component |
+| `src/components/auth/signup-form.tsx` | Signup form component |
+| `src/components/auth/unauthorized-screen.tsx` | Unauthorized error UI |
+| `src/app/login/page.tsx` | Login route |
+| `src/app/signup/page.tsx` | Signup route |
+| `src/app/unauthorized/page.tsx` | Unauthorized route |
+| `src/app/dashboard/page.tsx` | Dashboard with profile display |
+| `supabase/schema.sql` | Database schema + triggers |
+| `.env.local.example` | Environment variables template |
+
+#### 📁 Files Modified
+| File | Changes |
+|------|---------|
+| `src/app/layout.tsx` | Added AuthProvider wrapper |
+| `src/app/page.tsx` | Updated Sign in/Get started links |
+
+#### 🔧 Setup Required
+1. Create Supabase project at [supabase.com](https://supabase.com)
+2. Run `supabase/schema.sql` in SQL Editor
+3. Copy `.env.local.example` to `.env.local` and add Supabase credentials
+4. Enable Email auth in Supabase Dashboard > Authentication > Providers
+
+---
+
 *Last updated: 2026-09-07*

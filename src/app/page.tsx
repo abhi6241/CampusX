@@ -33,7 +33,7 @@ export default function Home() {
             <div className="w-px h-5 bg-border mx-1" />
             <ThemeToggle />
             <a
-              href="#sign-in"
+              href="/login"
               className="px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors"
             >
               Sign in
@@ -56,7 +56,7 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <a
-                href="#get-started"
+                href="/signup"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Get started
