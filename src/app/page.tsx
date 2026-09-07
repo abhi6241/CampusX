@@ -1,69 +1,157 @@
-import Image from "next/image";
+import {
+  GraduationCap,
+  Calendar,
+  Users,
+  BookOpen,
+  ArrowRight,
+  ChevronRight,
+} from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
+    <div className="flex flex-col min-h-screen">
+      <header className="border-b border-border bg-background">
+        <div className="container-app flex h-16 items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <GraduationCap className="h-6 w-6 text-primary" />
+            <span className="text-base font-semibold tracking-tight">CampusConnect</span>
+          </div>
+          <nav className="hidden md:flex items-center gap-1">
             <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              href="#features"
+              className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
+              Features
+            </a>
             <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              href="#about"
+              className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              About
+            </a>
+            <div className="w-px h-5 bg-border mx-1" />
+            <ThemeToggle />
+            <a
+              href="#sign-in"
+              className="px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors"
+            >
+              Sign in
+            </a>
+          </nav>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+      </header>
+
+      <main className="flex-1">
+        <section className="container-app py-20 md:py-28">
+          <div className="mx-auto max-w-2xl">
+            <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl mb-4">
+              Campus life,
+              <br />
+              simplified.
+            </h1>
+            <p className="text-lg text-muted-foreground mb-8 max-w-lg">
+              A unified platform for academics, scheduling, and campus community.
+              Built for the modern university.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <a
+                href="#get-started"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                Get started
+                <ArrowRight className="h-4 w-4" />
+              </a>
+              <a
+                href="#learn-more"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-border px-5 py-2.5 text-sm font-medium hover:bg-secondary transition-colors"
+              >
+                Learn more
+                <ChevronRight className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section id="features" className="container-app py-20 border-t border-border">
+          <div className="mb-12">
+            <h2 className="text-2xl font-semibold tracking-tight mb-2">
+              Features
+            </h2>
+            <p className="text-muted-foreground">
+              Everything you need to manage campus life.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-xl border border-border bg-card p-6">
+              <Calendar className="h-5 w-5 text-primary mb-3" />
+              <h3 className="text-sm font-semibold mb-1">Smart Scheduling</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Manage classes, exams, and events with an intelligent calendar
+                that syncs across all your devices.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-card p-6">
+              <Users className="h-5 w-5 text-primary mb-3" />
+              <h3 className="text-sm font-semibold mb-1">Community Hub</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Connect with classmates, join clubs, and participate in campus
+                discussions all in one place.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-card p-6">
+              <BookOpen className="h-5 w-5 text-primary mb-3" />
+              <h3 className="text-sm font-semibold mb-1">Academic Tracker</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Track your grades, assignments, and academic progress with
+                detailed analytics and insights.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="about" className="container-app py-20 border-t border-border">
+          <div className="mx-auto max-w-2xl">
+            <h2 className="text-2xl font-semibold tracking-tight mb-4">
+              Built with modern technology
+            </h2>
+            <p className="text-muted-foreground leading-relaxed mb-6">
+              CampusConnect is built on a foundation of modern web technologies
+              designed for performance, security, and scalability. From real-time
+              database updates to serverless edge functions, every component is
+              chosen to deliver a fast, reliable experience.
+            </p>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                Next.js 16
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                Supabase
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                TypeScript
+              </span>
+            </div>
+          </div>
+        </section>
       </main>
+
+      <footer className="border-t border-border bg-background">
+        <div className="container-app py-6 flex items-center justify-between text-sm text-muted-foreground">
+          <p>&copy; {new Date().getFullYear()} CampusConnect</p>
+          <div className="flex items-center gap-4">
+            <a href="#privacy" className="hover:text-foreground transition-colors">
+              Privacy
+            </a>
+            <a href="#terms" className="hover:text-foreground transition-colors">
+              Terms
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
