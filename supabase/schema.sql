@@ -84,12 +84,11 @@ BEGIN
     WHEN '001' THEN 'CSE'
     WHEN '002' THEN 'ECE'
     WHEN '003' THEN 'EEE'
-    WHEN '004' THEN 'ME'
-    WHEN '005' THEN 'CE'
-    WHEN '006' THEN 'IT'
-    WHEN '007' THEN 'AI'
-    WHEN '008' THEN 'DS'
-    ELSE 'Unknown'
+    WHEN '004' THEN 'MECH'
+    WHEN '005' THEN 'CIVIL'
+    WHEN '007' THEN 'CSE-AI'
+    WHEN '008' THEN 'CSE-DS'
+    ELSE branch_code
   END;
 
   INSERT INTO public.profiles (id, first_name, last_name, roll_number, branch, year)

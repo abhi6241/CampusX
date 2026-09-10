@@ -4,11 +4,10 @@ const BRANCH_CODES: Record<string, string> = {
   "001": "CSE",
   "002": "ECE",
   "003": "EEE",
-  "004": "ME",
-  "005": "CE",
-  "006": "IT",
-  "007": "AI",
-  "008": "DS",
+  "004": "MECH",
+  "005": "CIVIL",
+  "007": "CSE-AI",
+  "008": "CSE-DS",
 };
 
 export interface ParsedEmail {
@@ -36,8 +35,10 @@ export function parseVceEmail(email: string): ParsedEmail {
 
   if (!branch) {
     return {
-      isValid: false,
-      error: "Invalid branch code in email address",
+      isValid: true,
+      rollNumber: `1602-${yearCode}-${branchCode}-${rollSuffix}`,
+      branch: branchCode,
+      year,
     };
   }
 

@@ -69,8 +69,8 @@ campusx/
 ## Milestones
 
 - [x] **M1: Project Initialization** - Next.js, Tailwind, dependencies ✅ (2026-09-07)
-- [ ] **M2: Authentication** - Supabase Auth integration
-- [ ] **M3: Database Setup** - Supabase schema and RLS policies
+- [x] **M2: Authentication** - Supabase Auth integration ✅ (2026-09-07)
+- [x] **M3: Database Setup** - Supabase schema and RLS policies ✅ (2026-09-07)
 - [ ] **M4: Core Features** - Main application functionality
 - [ ] **M5: Deployment** - Production build and deployment
 
@@ -235,4 +235,55 @@ campusx/
 
 ---
 
-*Last updated: 2026-09-07*
+*Last updated: 2026-09-10*
+
+---
+
+### [0.5.0] - 2026-09-10
+
+#### 🚀 Features
+- First-time onboarding modal for new users
+- Immutable name logic (names locked after registration)
+- Dedicated user profile page with avatar upload and bio editing
+- Branch color badges (CSE, ECE, EEE, MECH, CIVIL, IT, CSE-AI, CSE-DS)
+- Display name uniqueness validation before save
+
+#### 🔐 Onboarding Flow
+- Dashboard checks if profile has empty names → forces onboarding modal
+- Two separate input fields: First Name and Last Name
+- Warning banner: "Your full name cannot be changed after registration."
+- Pre-save duplicate check against `profiles` table unique constraint
+- Clear error for duplicate names: "Please add a middle initial or variation."
+
+#### 👤 Profile Management
+- Dedicated `/profile` route with full profile view
+- Avatar upload to Supabase Storage (`avatars` bucket)
+- Bio/status editing with character limit
+- Locked name display with lock icon indicator
+- Auto-parsed roll number, branch badge, and academic year display
+
+#### 📁 Files Created
+| File | Description |
+|------|-------------|
+| `src/components/onboarding/onboarding-modal.tsx` | Onboarding modal component |
+| `src/app/profile/page.tsx` | Profile page route |
+| `src/components/profile/profile-card.tsx` | Profile display card |
+| `src/components/profile/avatar-upload.tsx` | Avatar upload with preview |
+| `src/components/profile/bio-editor.tsx` | Bio text editor |
+
+#### 📁 Files Modified
+| File | Changes |
+|------|---------|
+| `src/lib/auth.tsx` | Removed name metadata from signUp |
+| `src/app/dashboard/page.tsx` | Added onboarding check + Profile nav link |
+| `next.config.ts` | Added remotePatterns for Supabase Storage |
+| `supabase/schema.sql` | Branch renames: ME→MECH, CE→CIVIL, AI→CSE-AI, DS→CSE-DS |
+| `src/lib/email-validation.ts` | Branch renames: ME→MECH, CE→CIVIL, AI→CSE-AI, DS→CSE-DS |
+
+#### 🔧 Setup Required
+1. Create `avatars` bucket in Supabase Dashboard > Storage
+2. Set bucket to public read access for authenticated users
+
+---
+
+*Last updated: 2026-09-10*

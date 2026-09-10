@@ -79,10 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       password,
       options: {
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-        },
+        data: {},
       },
     });
 

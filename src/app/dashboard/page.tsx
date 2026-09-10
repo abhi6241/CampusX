@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   GraduationCap,
   LogOut,
@@ -9,10 +10,12 @@ import {
   Users,
   BookOpen,
   Loader2,
+  User,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase, Database } from "@/lib/supabase";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { OnboardingModal } from "@/components/onboarding/onboarding-modal";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
@@ -21,6 +24,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -34,12 +38,15 @@ export default function DashboardPage() {
         .from("profiles")
         .select("*")
         .eq("id", user.id)
-        .single()
+        .maybeSingle()
         .then(({ data, error }) => {
           if (error) {
             console.error("Error fetching profile:", error);
+          } else if (!data) {
+            setNeedsOnboarding(true);
           } else {
             setProfile(data);
+            setNeedsOnboarding(!data.first_name && !data.last_name);
           }
           setLoading(false);
         });
@@ -61,6 +68,26 @@ export default function DashboardPage() {
 
   if (!user) return null;
 
+  if (needsOnboarding) {
+    return (
+      <OnboardingModal
+        userId={user.id}
+        email={user.email!}
+        onComplete={() => {
+          setNeedsOnboarding(false);
+          supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .maybeSingle()
+            .then(({ data }) => {
+              if (data) setProfile(data);
+            });
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="border-b border-border bg-background">
@@ -73,6 +100,13 @@ export default function DashboardPage() {
           </div>
           <nav className="flex items-center gap-1">
             <ThemeToggle />
+            <Link
+              href="/profile"
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
+            >
+              <User className="h-4 w-4" />
+              Profile
+            </Link>
             <div className="w-px h-5 bg-border mx-1" />
             <button
               onClick={handleSignOut}
