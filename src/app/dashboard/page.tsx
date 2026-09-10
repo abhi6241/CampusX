@@ -14,8 +14,11 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase, Database } from "@/lib/supabase";
+import { createLogger } from "@/lib/logger";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { OnboardingModal } from "@/components/onboarding/onboarding-modal";
+
+const log = createLogger("Dashboard");
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
@@ -28,12 +31,14 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
+      log.info("User not authenticated, redirecting to login");
       router.push("/login");
     }
   }, [user, authLoading, router]);
 
   useEffect(() => {
     if (user) {
+      log.info("Fetching profile", { userId: user.id });
       supabase
         .from("profiles")
         .select("*")
@@ -41,12 +46,17 @@ export default function DashboardPage() {
         .maybeSingle()
         .then(({ data, error }) => {
           if (error) {
-            console.error("Error fetching profile:", error);
+            log.error("Failed to fetch profile", error, { userId: user.id });
           } else if (!data) {
+            log.info("No profile found, showing onboarding", { userId: user.id });
             setNeedsOnboarding(true);
           } else {
             setProfile(data);
-            setNeedsOnboarding(!data.first_name && !data.last_name);
+            const needsOnboard = !data.first_name && !data.last_name;
+            if (needsOnboard) {
+              log.info("Profile incomplete, showing onboarding", { userId: user.id });
+            }
+            setNeedsOnboarding(needsOnboard);
           }
           setLoading(false);
         });
@@ -80,7 +90,10 @@ export default function DashboardPage() {
             .select("*")
             .eq("id", user.id)
             .maybeSingle()
-            .then(({ data }) => {
+            .then(({ data, error }) => {
+              if (error) {
+                log.error("Failed to re-fetch profile after onboarding", error, { userId: user.id });
+              }
               if (data) setProfile(data);
             });
         }}

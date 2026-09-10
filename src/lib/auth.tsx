@@ -10,6 +10,9 @@ import {
 } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("Auth");
 
 interface AuthContextType {
   user: User | null;
@@ -39,15 +42,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!isSupabaseConfigured || initialized.current) return;
     initialized.current = true;
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        log.info("Session restored", { userId: session?.user?.id });
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      })
+      .catch((err) => {
+        log.error("Failed to restore session", err);
+        setLoading(false);
+      });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      log.info("Auth state changed", { event, userId: session?.user?.id });
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -57,15 +68,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    log.info("Sign-in attempt", { email });
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
+      log.error("Sign-in failed", error, { email });
       return { error: error.message };
     }
 
+    log.info("Sign-in successful", { email });
     return {};
   };
 
@@ -75,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     firstName: string,
     lastName: string
   ) => {
+    log.info("Sign-up attempt", { email });
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -84,14 +99,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (error) {
+      log.error("Sign-up failed", error, { email });
       return { error: error.message };
     }
 
+    log.info("Sign-up successful", { email });
     return {};
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    log.info("Signing out");
+    try {
+      await supabase.auth.signOut();
+      log.info("Sign-out successful");
+    } catch (err) {
+      log.error("Sign-out failed", err);
+    }
   };
 
   return (

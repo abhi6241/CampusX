@@ -3,6 +3,9 @@
 import { useState, useRef } from "react";
 import { X, Upload, FileText, Image, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("Upload");
 
 const BRANCHES = ["CSE", "ECE", "EEE", "MECH", "CIVIL", "IT", "CSE-AI", "CSE-DS"];
 const SEMESTERS = ["Sem 1", "Sem 2", "Sem 3", "Sem 4", "Sem 5", "Sem 6", "Sem 7", "Sem 8"];
@@ -55,11 +58,13 @@ export function UploadModal({
     setError("");
 
     if (selected.size > MAX_SIZE) {
+      log.warn("File exceeds 15MB limit", { size: selected.size });
       setError("File must be less than 15MB.");
       return;
     }
 
     if (!ALLOWED_TYPES.includes(selected.type)) {
+      log.warn("Invalid file type", { type: selected.type });
       setError("Only PDF, JPEG, PNG, and WebP files are allowed.");
       return;
     }
@@ -72,11 +77,13 @@ export function UploadModal({
     setError("");
 
     if (!title.trim() || !subject.trim()) {
+      log.warn("Upload validation failed", { reason: "Missing title or subject" });
       setError("Title and subject are required.");
       return;
     }
 
     if (!file) {
+      log.warn("Upload validation failed", { reason: "No file selected" });
       setError("Please select a file to upload.");
       return;
     }
@@ -87,20 +94,26 @@ export function UploadModal({
     const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
     const filePath = `${branch}/${semester}/${timestamp}-${safeName}`;
 
+    log.info("Uploading resource", { title: title.trim(), subject: subject.trim(), branch, semester, type: file.type, size: file.size, path: filePath });
+
     const { error: uploadError } = await supabase.storage
       .from("student-documents")
       .upload(filePath, file);
 
     if (uploadError) {
+      log.error("Storage upload failed", uploadError, { path: filePath });
       setError(uploadError.message);
       setLoading(false);
       return;
     }
 
+    log.info("File uploaded to storage", { path: filePath });
+
     const { data: urlData } = supabase.storage
       .from("student-documents")
       .getPublicUrl(filePath);
 
+    log.info("Creating resource record", { title: title.trim(), resourceType });
     const { error: insertError } = await supabase.from("resources").insert({
       title: title.trim(),
       resource_type: resourceType,
@@ -113,11 +126,13 @@ export function UploadModal({
     });
 
     if (insertError) {
+      log.error("Failed to create resource record", insertError);
       setError(insertError.message);
       setLoading(false);
       return;
     }
 
+    log.info("Resource upload complete", { title: title.trim() });
     reset();
     setLoading(false);
     onUploadComplete();

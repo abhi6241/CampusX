@@ -4,6 +4,9 @@ import { useState, useRef } from "react";
 import Image from "next/image";
 import { Camera, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("Avatar");
 
 interface AvatarUploadProps {
   userId: string;
@@ -34,26 +37,32 @@ export function AvatarUpload({
     setError("");
 
     if (file.size > 2 * 1024 * 1024) {
+      log.warn("File exceeds 2MB limit", { size: file.size });
       setError("Image must be less than 2MB.");
       return;
     }
 
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      log.warn("Invalid file type", { type: file.type });
       setError("Please upload a JPG, PNG, or WebP image.");
       return;
     }
 
     setUploading(true);
+    log.info("Uploading avatar", { userId, size: file.size, type: file.type });
 
     const { error: uploadError } = await supabase.storage
       .from("avatars")
       .upload(userId, file, { upsert: true });
 
     if (uploadError) {
+      log.error("Avatar upload failed", uploadError, { userId });
       setError(uploadError.message);
       setUploading(false);
       return;
     }
+
+    log.info("Avatar uploaded to storage", { userId });
 
     const {
       data: { publicUrl },
@@ -65,11 +74,13 @@ export function AvatarUpload({
       .eq("id", userId);
 
     if (updateError) {
+      log.error("Failed to update avatar URL", updateError, { userId });
       setError(updateError.message);
       setUploading(false);
       return;
     }
 
+    log.info("Avatar URL updated in profile", { userId });
     onAvatarUpdate(publicUrl);
     setUploading(false);
   };

@@ -364,3 +364,66 @@ campusx/
 ---
 
 *Last updated: 2026-09-10*
+
+---
+
+### [0.7.0] - 2026-09-10
+
+#### 📝 Logging & Observability
+- Added centralized logger module with structured output
+- Log levels: debug, info, warn, error (debug hidden in production)
+- Contextual prefixes for filtering: `[Auth]`, `[Dashboard]`, `[Upload]`, etc.
+- ISO timestamps for log aggregation and debugging
+
+#### 🔧 Logger Module (`src/lib/logger.ts`)
+- Factory pattern: `createLogger("Context")` returns scoped logger
+- Four log levels: `debug`, `info`, `warn`, `error`
+- Structured format: `[timestamp] [LEVEL] [Context] message`
+- `error()` accepts both message and error object for stack traces
+- Environment-aware: debug logs hidden in production
+
+#### 📊 Logging Coverage (12 files)
+| File | Events Logged |
+|------|---------------|
+| `src/lib/supabase.ts` | Client init, credential warnings |
+| `src/lib/auth.tsx` | Session restore, auth state changes, sign-in/up/out attempts |
+| `src/components/auth/login-form.tsx` | Login attempts, validation, success/failure |
+| `src/components/auth/signup-form.tsx` | Signup attempts, validation, success/failure |
+| `src/components/onboarding/onboarding-modal.tsx` | Name uniqueness check, profile create/update |
+| `src/components/profile/avatar-upload.tsx` | File validation, storage upload, DB update |
+| `src/components/profile/bio-editor.tsx` | Bio save attempts |
+| `src/app/dashboard/page.tsx` | Profile fetch, onboarding detection |
+| `src/app/profile/page.tsx` | Profile fetch |
+| `src/app/resources/page.tsx` | Resource/profile fetch, re-fetch after upload |
+| `src/components/resources/upload-modal.tsx` | Validation, storage upload, DB insert |
+
+#### 🐛 Error Handling Fixes
+- Fixed `auth.tsx`: Added `.catch()` to `getSession()` to prevent unhandled rejection
+- Fixed `auth.tsx`: Wrapped `signOut()` in try/catch to prevent unhandled rejection
+- Fixed `resources/page.tsx`: Added error checking on `Promise.all()` results (critical gap)
+- Fixed `resources/page.tsx`: Added error logging on re-fetch after upload
+- Fixed `dashboard/page.tsx`: Added error logging on re-fetch after onboarding
+
+#### 📁 Files Created
+| File | Description |
+|------|-------------|
+| `src/lib/logger.ts` | Centralized logger module with levels and context |
+
+#### 📁 Files Modified
+| File | Changes |
+|------|---------|
+| `src/lib/supabase.ts` | Added logger for client init + credential warnings |
+| `src/lib/auth.tsx` | Added logging + fixed getSession/signOut error handling |
+| `src/components/auth/login-form.tsx` | Added login attempt/result logging |
+| `src/components/auth/signup-form.tsx` | Added signup attempt/result logging |
+| `src/components/onboarding/onboarding-modal.tsx` | Added onboarding flow logging |
+| `src/components/profile/avatar-upload.tsx` | Added avatar upload logging |
+| `src/components/profile/bio-editor.tsx` | Added bio save logging |
+| `src/app/dashboard/page.tsx` | Added profile fetch logging + fixed error handling |
+| `src/app/profile/page.tsx` | Added profile fetch logging |
+| `src/app/resources/page.tsx` | Added resource fetch logging + fixed critical error gap |
+| `src/components/resources/upload-modal.tsx` | Added upload flow logging |
+
+---
+
+*Last updated: 2026-09-10*

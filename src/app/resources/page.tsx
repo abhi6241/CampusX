@@ -13,10 +13,13 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase, Database } from "@/lib/supabase";
+import { createLogger } from "@/lib/logger";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { FilterBar } from "@/components/resources/filter-bar";
 import { ResourceCard } from "@/components/resources/resource-card";
 import { UploadModal } from "@/components/resources/upload-modal";
+
+const log = createLogger("Resources");
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type Resource = Database["public"]["Tables"]["resources"]["Row"];
@@ -39,12 +42,14 @@ export default function ResourcesPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
+      log.info("User not authenticated, redirecting to login");
       router.push("/login");
     }
   }, [user, authLoading, router]);
 
   useEffect(() => {
     if (user) {
+      log.info("Fetching resources and profile", { userId: user.id });
       Promise.all([
         supabase
           .from("profiles")
@@ -56,11 +61,18 @@ export default function ResourcesPage() {
           .select("*, profiles!inner(first_name, last_name)")
           .order("created_at", { ascending: false }),
       ]).then(([profileResult, resourcesResult]) => {
+        if (profileResult.error) {
+          log.error("Failed to fetch profile", profileResult.error, { userId: user.id });
+        }
+        if (resourcesResult.error) {
+          log.error("Failed to fetch resources", resourcesResult.error);
+        }
         if (profileResult.data) {
           setProfile(profileResult.data);
         }
         if (resourcesResult.data) {
           setResources(resourcesResult.data as ResourceWithUploader[]);
+          log.info("Resources loaded", { count: resourcesResult.data.length });
         }
         setLoading(false);
       });
@@ -227,7 +239,10 @@ export default function ResourcesPage() {
             .from("resources")
             .select("*, profiles!inner(first_name, last_name)")
             .order("created_at", { ascending: false })
-            .then(({ data }) => {
+            .then(({ data, error }) => {
+              if (error) {
+                log.error("Failed to re-fetch resources after upload", error);
+              }
               if (data) setResources(data as ResourceWithUploader[]);
             });
         }}

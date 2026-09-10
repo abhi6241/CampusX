@@ -12,8 +12,11 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase, Database } from "@/lib/supabase";
+import { createLogger } from "@/lib/logger";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ProfileCard } from "@/components/profile/profile-card";
+
+const log = createLogger("Profile");
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
@@ -25,12 +28,14 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
+      log.info("User not authenticated, redirecting to login");
       router.push("/login");
     }
   }, [user, authLoading, router]);
 
   useEffect(() => {
     if (user) {
+      log.info("Fetching profile", { userId: user.id });
       supabase
         .from("profiles")
         .select("*")
@@ -38,7 +43,7 @@ export default function ProfilePage() {
         .maybeSingle()
         .then(({ data, error }) => {
           if (error) {
-            console.error("Error fetching profile:", error);
+            log.error("Failed to fetch profile", error, { userId: user.id });
           }
           setProfile(data);
           setLoading(false);

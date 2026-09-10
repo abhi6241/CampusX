@@ -4,6 +4,9 @@ import { useState } from "react";
 import { GraduationCap, AlertTriangle, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { parseVceEmail } from "@/lib/email-validation";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("Onboarding");
 
 interface OnboardingModalProps {
   userId: string;
@@ -32,6 +35,7 @@ export function OnboardingModal({
 
     setLoading(true);
 
+    log.info("Checking name uniqueness", { firstName: firstName.trim(), lastName: lastName.trim() });
     const { data: existing } = await supabase
       .from("profiles")
       .select("id")
@@ -40,6 +44,7 @@ export function OnboardingModal({
       .maybeSingle();
 
     if (existing) {
+      log.warn("Name already taken", { firstName: firstName.trim(), lastName: lastName.trim() });
       setError(
         "This name is already taken. Please add a middle initial or variation."
       );
@@ -47,6 +52,7 @@ export function OnboardingModal({
       return;
     }
 
+    log.info("Checking existing profile", { userId });
     const { data: existingProfile } = await supabase
       .from("profiles")
       .select("id")
@@ -54,6 +60,7 @@ export function OnboardingModal({
       .maybeSingle();
 
     if (existingProfile) {
+      log.info("Updating profile name", { userId });
       const { error: updateError } = await supabase
         .from("profiles")
         .update({
@@ -63,12 +70,15 @@ export function OnboardingModal({
         .eq("id", userId);
 
       if (updateError) {
+        log.error("Failed to update profile", updateError, { userId });
         setError(updateError.message);
         setLoading(false);
         return;
       }
+      log.info("Profile name updated successfully", { userId });
     } else {
       const parsed = parseVceEmail(email);
+      log.info("Creating new profile", { userId, branch: parsed.branch, year: parsed.year });
       const { error: insertError } = await supabase.from("profiles").insert({
         id: userId,
         first_name: firstName.trim(),
@@ -79,10 +89,12 @@ export function OnboardingModal({
       });
 
       if (insertError) {
+        log.error("Failed to create profile", insertError, { userId });
         setError(insertError.message);
         setLoading(false);
         return;
       }
+      log.info("Profile created successfully", { userId });
     }
 
     onComplete();

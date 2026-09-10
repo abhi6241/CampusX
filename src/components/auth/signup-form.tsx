@@ -6,7 +6,10 @@ import Link from "next/link";
 import { GraduationCap, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { parseVceEmail } from "@/lib/email-validation";
+import { createLogger } from "@/lib/logger";
 import { ThemeToggle } from "@/components/theme-toggle";
+
+const log = createLogger("Signup");
 
 export function SignupForm() {
   const [email, setEmail] = useState("");
@@ -25,24 +28,29 @@ export function SignupForm() {
 
     const parsed = parseVceEmail(email);
     if (!parsed.isValid) {
+      log.warn("Invalid email format", { email });
       router.push("/unauthorized");
       return;
     }
 
     if (!firstName.trim() || !lastName.trim()) {
+      log.warn("Missing required fields");
       setError("First name and last name are required");
       return;
     }
 
     setLoading(true);
+    log.info("Sign-up attempt", { email });
     const result = await signUp(email, password, firstName.trim(), lastName.trim());
 
     if (result.error) {
+      log.error("Sign-up failed", result.error, { email });
       setError(result.error);
       setLoading(false);
       return;
     }
 
+    log.info("Sign-up successful, redirecting to dashboard", { email });
     router.push("/dashboard");
   };
 

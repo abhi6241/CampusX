@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("Bio");
 
 interface BioEditorProps {
   userId: string;
@@ -21,6 +24,7 @@ export function BioEditor({ userId, bio, onBioUpdate }: BioEditorProps) {
   const handleSave = async () => {
     setLoading(true);
     setError("");
+    log.info("Saving bio", { userId });
 
     const trimmed = value.trim();
 
@@ -30,11 +34,13 @@ export function BioEditor({ userId, bio, onBioUpdate }: BioEditorProps) {
       .eq("id", userId);
 
     if (updateError) {
+      log.error("Failed to save bio", updateError, { userId });
       setError(updateError.message);
       setLoading(false);
       return;
     }
 
+    log.info("Bio saved successfully", { userId });
     onBioUpdate(trimmed);
     setEditing(false);
     setLoading(false);

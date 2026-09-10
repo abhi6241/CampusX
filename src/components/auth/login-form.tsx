@@ -6,7 +6,10 @@ import Link from "next/link";
 import { GraduationCap, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { isValidVceEmail } from "@/lib/email-validation";
+import { createLogger } from "@/lib/logger";
 import { ThemeToggle } from "@/components/theme-toggle";
+
+const log = createLogger("Login");
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -22,19 +25,23 @@ export function LoginForm() {
     setError("");
 
     if (!isValidVceEmail(email)) {
+      log.warn("Invalid email format", { email });
       router.push("/unauthorized");
       return;
     }
 
     setLoading(true);
+    log.info("Login attempt", { email });
     const result = await signIn(email, password);
 
     if (result.error) {
+      log.error("Login failed", result.error, { email });
       setError(result.error);
       setLoading(false);
       return;
     }
 
+    log.info("Login successful, redirecting to dashboard", { email });
     router.push("/dashboard");
   };
 

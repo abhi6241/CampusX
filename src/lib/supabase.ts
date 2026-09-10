@@ -1,7 +1,16 @@
 import { createClient } from "@supabase/supabase-js";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("Supabase");
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  log.warn("Supabase credentials missing — client will fail to connect");
+} else {
+  log.info("Supabase client initialized", { url: supabaseUrl });
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
