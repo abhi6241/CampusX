@@ -110,3 +110,42 @@ CREATE OR REPLACE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_new_user();
+
+-- ============================================================
+-- Resources Table (Notes & PYP)
+-- ============================================================
+
+-- Create resources table
+CREATE TABLE IF NOT EXISTS resources (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  resource_type TEXT NOT NULL CHECK (resource_type IN ('note', 'pyp')),
+  subject TEXT NOT NULL,
+  branch TEXT NOT NULL,
+  semester_year TEXT NOT NULL,
+  file_url TEXT NOT NULL,
+  file_type TEXT NOT NULL,
+  uploaded_by UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+-- Indexes for filtering
+CREATE INDEX IF NOT EXISTS idx_resources_type ON resources (resource_type);
+CREATE INDEX IF NOT EXISTS idx_resources_branch ON resources (branch);
+CREATE INDEX IF NOT EXISTS idx_resources_semester ON resources (semester_year);
+CREATE INDEX IF NOT EXISTS idx_resources_uploaded_by ON resources (uploaded_by);
+
+-- RLS
+ALTER TABLE resources ENABLE ROW LEVEL SECURITY;
+
+-- All authenticated users can read
+CREATE POLICY "Resources are viewable by authenticated users"
+  ON resources FOR SELECT TO authenticated USING (true);
+
+-- Authenticated users can insert
+CREATE POLICY "Authenticated users can upload resources"
+  ON resources FOR INSERT TO authenticated WITH CHECK (auth.uid() = uploaded_by);
+
+-- Users can delete their own uploads
+CREATE POLICY "Users can delete own resources"
+  ON resources FOR DELETE TO authenticated USING (auth.uid() = uploaded_by);

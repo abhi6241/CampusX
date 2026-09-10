@@ -8,6 +8,7 @@ import {
   LogOut,
   ArrowLeft,
   Loader2,
+  BookOpen,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase, Database } from "@/lib/supabase";
@@ -76,6 +77,13 @@ export default function ProfilePage() {
           </div>
           <nav className="flex items-center gap-1">
             <ThemeToggle />
+            <Link
+              href="/resources"
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
+            >
+              <BookOpen className="h-4 w-4" />
+              Resources
+            </Link>
             <div className="w-px h-5 bg-border mx-1" />
             <button
               onClick={handleSignOut}

@@ -43,6 +43,44 @@ export type Database = {
           created_at?: string;
         };
       };
+      resources: {
+        Row: {
+          id: string;
+          title: string;
+          resource_type: string;
+          subject: string;
+          branch: string;
+          semester_year: string;
+          file_url: string;
+          file_type: string;
+          uploaded_by: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          resource_type: string;
+          subject: string;
+          branch: string;
+          semester_year: string;
+          file_url: string;
+          file_type: string;
+          uploaded_by: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          resource_type?: string;
+          subject?: string;
+          branch?: string;
+          semester_year?: string;
+          file_url?: string;
+          file_type?: string;
+          uploaded_by?: string;
+          created_at?: string;
+        };
+      };
     };
   };
 };

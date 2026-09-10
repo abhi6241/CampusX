@@ -101,6 +101,13 @@ export default function DashboardPage() {
           <nav className="flex items-center gap-1">
             <ThemeToggle />
             <Link
+              href="/resources"
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
+            >
+              <BookOpen className="h-4 w-4" />
+              Resources
+            </Link>
+            <Link
               href="/profile"
               className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
             >
@@ -145,13 +152,16 @@ export default function DashboardPage() {
               Connect with classmates and join campus groups.
             </p>
           </div>
-          <div className="rounded-xl border border-border bg-card p-6">
+          <Link
+            href="/resources"
+            className="rounded-xl border border-border bg-card p-6 hover:shadow-sm transition-shadow block"
+          >
             <BookOpen className="h-5 w-5 text-primary mb-3" />
             <h3 className="text-sm font-semibold mb-1">Academics</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Track grades, assignments, and academic progress.
+              Access notes, previous year papers, and study materials.
             </p>
-          </div>
+          </Link>
         </div>
 
         <div className="rounded-xl border border-border bg-card p-6">

@@ -287,3 +287,80 @@ campusx/
 ---
 
 *Last updated: 2026-09-10*
+
+---
+
+### [0.6.0] - 2026-09-10
+
+#### 🚀 Features
+- Notes & Previous Year Papers (PYP) repository hub
+- Tabbed interface: Study Notes and PYP Bank
+- File upload with 15MB limit (PDFs, JPEG, PNG, WebP)
+- Real-time search filters by Branch, Semester, and Subject
+- Resource cards with file type icons, branch badges, and download links
+- Upload modal with subject, branch, semester, and file selection
+
+#### 📚 Resources Hub
+- Dedicated `/resources` route with enterprise dashboard layout
+- Tab toggle between Study Notes and PYP Bank
+- Filter bar: Branch dropdown, Semester dropdown, Subject keyword search
+- Resource grid with responsive 1/2/3 column layout
+- Empty state with contextual messages and clear filters action
+
+#### 📤 Upload Modal
+- Resource type toggle (Notes / PYP)
+- Form fields: Title, Subject Name, Branch, Semester
+- File picker with drag-style drop zone
+- Client-side validation: 15MB max, PDF/JPEG/PNG/WebP only
+- Upload to Supabase Storage `student-documents` bucket
+- File path convention: `{branch}/{semester}/{timestamp}-{filename}`
+
+#### 🗄️ Database Schema
+| Table | Description |
+|-------|-------------|
+| `resources` | Study materials and previous year papers |
+
+**resources table columns:**
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | UUID | PK, auto-generated |
+| `title` | TEXT | Resource title |
+| `resource_type` | TEXT | 'note' or 'pyp' |
+| `subject` | TEXT | Subject name |
+| `branch` | TEXT | CSE, ECE, etc. |
+| `semester_year` | TEXT | Sem 1 through Sem 8 |
+| `file_url` | TEXT | Supabase Storage URL |
+| `file_type` | TEXT | MIME type |
+| `uploaded_by` | UUID | FK to auth.users |
+| `created_at` | TIMESTAMPTZ | Default NOW() |
+
+**RLS Policies:**
+- All authenticated users can read resources
+- Authenticated users can insert their own uploads
+- Users can delete their own uploads
+
+#### 📁 Files Created
+| File | Description |
+|------|-------------|
+| `src/app/resources/page.tsx` | Resources page with tabs, filters, grid |
+| `src/components/resources/upload-modal.tsx` | Upload modal with form + file handling |
+| `src/components/resources/resource-card.tsx` | Resource display card |
+| `src/components/resources/filter-bar.tsx` | Branch, semester, subject search filters |
+
+#### 📁 Files Modified
+| File | Changes |
+|------|---------|
+| `supabase/schema.sql` | Added `resources` table + RLS policies |
+| `src/lib/supabase.ts` | Added `resources` TypeScript types |
+| `src/app/dashboard/page.tsx` | Added Resources nav link + linked Academics card |
+| `src/app/profile/page.tsx` | Added Resources nav link |
+
+#### 🔧 Setup Required
+1. Create `student-documents` bucket in Supabase Dashboard > Storage
+2. Set 15MB file size limit in bucket settings
+3. Run storage policies SQL for `student-documents` bucket
+4. Run `resources` table SQL from `supabase/schema.sql`
+
+---
+
+*Last updated: 2026-09-10*
